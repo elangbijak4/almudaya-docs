@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokumentasi | Almudaya Blockchain</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="brand">Almudaya</div>
+            <div class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="tutorial.html" class="active">Dokumentasi</a>
+                <a href="https://github.com/elangbijak4/almudaya-blockchain" target="_blank">GitHub</a>
+            </div>
+        </nav>
+
+        <div class="docs-layout">
+            <aside class="sidebar">
+                <h3>Navigasi</h3>
+                <ul id="toc">
+                    <li><a href="#persiapan" class="active">1. Persiapan Awal</a></li>
+                    <li><a href="#metamask">2. Koneksi ke MetaMask</a></li>
+                    <li><a href="#smart-contract">3. Pengenalan AVM</a></li>
+                    <li><a href="#demo-dapp">4. Demo DApp (Frontend)</a></li>
+                </ul>
+            </aside>
+
+            <main class="content">
+                <h1>Panduan Pelatihan Dosen & Mahasiswa</h1>
+                <p>Panduan komprehensif ini ditujukan bagi dosen atau instruktur yang ingin menggunakan <strong>Almudaya Blockchain</strong> sebagai media pengajaran kelas atau demonstrasi pembuatan Decentralized Application (DApp).</p>
+
+                <div class="alert alert-info">
+                    <strong>Catatan:</strong> Platform ini adalah purwarupa blockchain modular yang dibangun dengan Node.js. Ia memiliki Virtual Machine miliknya sendiri (bukan EVM), namun dilengkapi dengan lapisan RPC yang 100% kompatibel dengan MetaMask.
+                </div>
+
+                <h2 id="persiapan">1. Persiapan & Menjalankan Node Lokal</h2>
+                <p>Syarat utama: Komputer/laptop dosen dan mahasiswa harus sudah terinstal <strong>Node.js</strong> (versi 18 ke atas).</p>
+                
+                <p>Untuk menjalankan blockchain lokal, tidak perlu mengunduh installer. Buka terminal (Command Prompt) dan ketik:</p>
+                <pre><code>npx almudaya-blockchain</code></pre>
+                
+                <p>Saat dijalankan pertama kali, terminal akan menampilkan informasi penting:</p>
+                <ul>
+                    <li><strong>Alamat RPC Server:</strong> <code>http://127.0.0.1:8545/rpc</code></li>
+                    <li><strong>Chain ID:</strong> <code>0x539</code> (1337 dalam desimal)</li>
+                    <li><strong>Mnemonic (Words Phrase):</strong> 12 kata rahasia yang bisa diimpor ke MetaMask.</li>
+                    <li><strong>20 Akun Demo:</strong> Masing-masing berisi 10.000 saldo (beserta Private Key-nya).</li>
+                </ul>
+
+                <h2 id="metamask">2. Menghubungkan ke MetaMask</h2>
+                <p>Agar mahasiswa dapat berinteraksi dengan blockchain ini melalui antarmuka web, mereka perlu mengonfigurasi dompet MetaMask di browser mereka.</p>
+                
+                <ol>
+                    <li>Buka ekstensi <strong>MetaMask</strong>.</li>
+                    <li>Klik pemilih jaringan (Network Selector) di bagian atas dan pilih <strong>"Add a network manually"</strong>.</li>
+                    <li>Masukkan data berikut:
+                        <ul>
+                            <li><strong>Network Name:</strong> Almudaya Localnet</li>
+                            <li><strong>New RPC URL:</strong> <code>http://127.0.0.1:8545/rpc</code></li>
+                            <li><strong>Chain ID:</strong> <code>1337</code></li>
+                            <li><strong>Currency Symbol:</strong> <code>AGV</code></li>
+                        </ul>
+                    </li>
+                    <li>Simpan. Kini MetaMask Anda telah terhubung ke Almudaya Blockchain!</li>
+                </ol>
+                <p>Anda bisa mengimpor salah satu <em>Private Key</em> dari terminal untuk melihat saldo 10.000 AGV Anda muncul di dompet.</p>
+
+                <h2 id="smart-contract">3. Bahasa Smart Contract (AVM)</h2>
+                <p>Berbeda dengan Ethereum yang menggunakan Solidity, Almudaya menggunakan instruksi perakitan (Assembly-like) sederhana yang dirancang khusus untuk keperluan edukasi dasar blockchain.</p>
+                
+                <p>Contoh kontrak sederhana untuk membagi donasi ke 2 alamat:</p>
+                <pre><code>// Kontrak Splitter
+PUSH 0xAddressPenerima1
+PUSH 50
+TRANSFER
+PUSH 0xAddressPenerima2
+PUSH 50
+TRANSFER
+HALT</code></pre>
+
+                <div class="alert alert-warning">
+                    <strong>Penting:</strong> Karena ini adalah Custom AVM, Anda tidak bisa mendeploy kontrak menggunakan Web3.js standar (seperti pada Ethereum). Anda harus menggunakan metode RPC <code>deployContract</code> dan <code>callContract</code> yang disediakan oleh API lokal Almudaya.
+                </div>
+
+                <h2 id="demo-dapp">4. Demonstrasi Interaksi DApp (Frontend)</h2>
+                <p>Berikut adalah contoh kode HTML/JavaScript statis yang dapat diberikan kepada mahasiswa untuk mendemonstrasikan interaksi Web3 murni menggunakan <strong>Fetch API</strong> (tanpa library tambahan).</p>
+
+                <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Demo DApp Almudaya&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Cek Saldo Akun&lt;/h1&gt;
+    &lt;input type="text" id="addressInput" placeholder="Masukkan Address 0x..." style="width: 300px;"&gt;
+    &lt;button onclick="cekSaldo()"&gt;Cek Saldo&lt;/button&gt;
+    
+    &lt;h2 id="hasilSaldo"&gt;Saldo: 0&lt;/h2&gt;
+
+    &lt;script&gt;
+        async function cekSaldo() {
+            const address = document.getElementById('addressInput').value;
+            
+            // Format JSON-RPC standar Ethereum
+            const payload = {
+                jsonrpc: "2.0",
+                method: "eth_getBalance",
+                params: [address, "latest"],
+                id: 1
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8545/rpc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                // Konversi dari Hex (Wei) ke Desimal
+                const saldoHex = data.result;
+                const saldoDecimal = parseInt(saldoHex, 16);
+                
+                document.getElementById('hasilSaldo').innerText = "Saldo: " + saldoDecimal + " AGV";
+            } catch (error) {
+                alert("Gagal koneksi ke RPC Server Almudaya!");
+                console.error(error);
+            }
+        }
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+            </main>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Elang Bijak. Dirilis di bawah Lisensi MIT.</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
