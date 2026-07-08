@@ -313,6 +313,27 @@ nav {
     border-color: #ffaa00;
 }
 
+/* App Showcase Image */
+.app-showcase {
+    margin: 4rem auto 0;
+    max-width: 900px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(0, 255, 204, 0.2);
+    border: 1px solid var(--border-glass);
+    transition: transform 0.3s ease;
+}
+
+.app-showcase:hover {
+    transform: scale(1.02);
+}
+
+.app-showcase img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 /* Footer */
 footer {
     text-align: center;
